@@ -1,0 +1,95 @@
+﻿@model autocomplete.Models.Venue
+
+@{
+    ViewBag.Title = "About";
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+
+<p>Use this area to provide additional information.</p>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<div class="row">
+    <div class="col-md-8">
+        <div class="form-group">
+                @Html.LabelFor(m => m.Name, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", id = "TextBoxVenueLocation" })
+                </div>
+            </div>
+
+        @*<form>
+            <input id="autocomplete">
+        </form>*@
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $( function() {
+        var availableTags = [
+            "ActionScript",
+            "AppleScript",
+            "Asp",
+            "BASIC",
+            "C",
+            "C++",
+            "Clojure",
+            "COBOL",
+            "ColdFusion",
+            "Erlang",
+            "Fortran",
+            "Groovy",
+            "Haskell",
+            "Java",
+            "JavaScript",
+            "Lisp",
+            "Perl",
+            "PHP",
+            "Python",
+            "Ruby",
+            "Scala",
+            "Scheme"
+        ];
+        $( "#autocomplete" ).autocomplete({
+            source: availableTags
+        });
+    });
+
+    $(function () {
+        $("#TextBoxVenueLocation").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "@Url.Action("GetEventVenuesList", "Home")",
+                    data: { SearchText: request.term },
+                    dataType: "json",
+                    type: "GET",
+                    success: function (data) {
+                        if (data.length == 0) {
+                            $('#EventVenueId').val("");
+                            return false;
+                        }
+                        else {
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.description
+                                }
+                            }));
+                        }
+                    },
+                    error: function (x, y, z) {
+                        alert('error');
+                    }
+                });
+            },
+            messages: {
+                noResults: "", results: ""
+            },
+            select: function (event, ui) {
+                $('#TextBoxVenueLocation').val(ui.item.label);
+                return false;
+            }
+        }).autocomplete("widget").addClass("CitiesAutocomplete");
+    });
+</script>
